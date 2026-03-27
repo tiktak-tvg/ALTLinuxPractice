@@ -59,4 +59,4 @@ ID 258 gen 134 top level 257 path var/lib/machines
 <img width="1024" height="768" alt="image" src="https://github.com/user-attachments/assets/bd54b427-2b1c-46dd-87ae-ea9b0277bed2" />
 
 >[!Warning]
-С выбранных дисков будут удалены все данные без возможности восстановления.
+> - С выбранных дисков будут удалены все данные без возможности восстановления.
