@@ -1,5 +1,7 @@
 ### Error Connection error 401: permission denied - invalid PVE ticket
 
+<img width="1375" height="273" alt="image" src="https://github.com/user-attachments/assets/fcfabf0a-1273-435a-9708-62622624a2cb" />
+
 Эта ошибка означает, что истек срок действия или является недействительным тикет авторизации (сессия) в системе виртуализации Proxmox Virtual Environment (PVE).
 
 Чаще всего это происходит при использовании API, консольных утилит (например, pvesh), резервного копирования (Proxmox Backup Server), плагинов для Grafana/Whmcs или при долго открытом веб-интерфейсе.
