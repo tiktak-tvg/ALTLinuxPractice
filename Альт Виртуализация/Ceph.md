@@ -49,16 +49,18 @@ VG pve объединяет два физических тома: /dev/sda2 (894
 sdc, sdd, sde, sdf – по 3.6 ТБ, полностью свободны (нет разделов, не в LVM).
 
 
-##### Расширить локальное LVM-thin хранилище за счёт /dev/sdb
+##### 1. Расширяем локальное LVM-thin хранилище за счёт /dev/sdb
 
-###### Расширить тонкий пул data на всё свободное место в VG
+###### Расширяем тонкий пул data на всё свободное место в VG
 ```bash
 lvextend -l +100%FREE pve/data
 ```
-###### Проверить новый размер
+###### Проверяем новый размер
 ```bash
 lvs -a -o +devices,size,data_percent,metadata_percent pve/data
 ```
+
+<img width="1262" height="213" alt="image" src="https://github.com/user-attachments/assets/5c963a96-c480-45c3-bf22-dec1facd5bef" />
 
 
 
