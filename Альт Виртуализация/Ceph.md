@@ -62,6 +62,8 @@ lvs -a -o +devices,size,data_percent,metadata_percent pve/data
 
 <img width="1262" height="213" alt="image" src="https://github.com/user-attachments/assets/5c963a96-c480-45c3-bf22-dec1facd5bef" />
 
+##### 2. Настраиваем Ceph на этой ноде (как отдельный кластер или часть общего)
+4 диска по 3.6 ТБ – идеально для создания OSD. Если вы хотите использовать Ceph для отказоустойчивого хранилища
 
 
 
