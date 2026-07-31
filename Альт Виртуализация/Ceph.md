@@ -47,6 +47,18 @@ VG pve объединяет два физических тома: /dev/sda2 (894
 
 sdc, sdd, sde, sdf – по 3.6 ТБ, полностью свободны (нет разделов, не в LVM).
 
+И есть задача расширить корневой диск.
+
+##### 1. Расширяем корневой диск с подключением не использованным пространством диска sdb
+```bash
+vgextend pve /dev/sdb
+lvextend -L +100G /dev/pve/root
+resize2fs /dev/mapper/pve-root
+```
+
+<img width="1427" height="197" alt="image" src="https://github.com/user-attachments/assets/95ff53de-849c-49b3-b380-c042eafb38cb" />
+
+<img width="1424" height="701" alt="image" src="https://github.com/user-attachments/assets/1463636d-eda7-47f0-9409-edcf1b7d9a20" />
 
 ##### 1. Расширяем локальное LVM-thin хранилище за счёт /dev/sdb
 
