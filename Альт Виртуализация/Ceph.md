@@ -89,7 +89,7 @@ lvs -a -o +devices,size,data_percent,metadata_percent pve/data
 
 <img width="1391" height="699" alt="image" src="https://github.com/user-attachments/assets/3f51c526-7d83-4de9-9ba0-3eef1b928b83" />
 
-Теперь переходим в Shell на первой ноде
+> - Теперь переходим в Shell на первой ноде
 
 ###### Создайте монитор (первый на этой ноде)
 pveceph mon create
