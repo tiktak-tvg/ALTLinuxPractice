@@ -3,8 +3,7 @@
 ```bash
 lsblk
 ```
-
-<img width="1376" height="588" alt="image" src="https://github.com/user-attachments/assets/fa601821-acb0-416d-8ba3-721da2b5cda5" />
+<img width="1294" height="509" alt="image" src="https://github.com/user-attachments/assets/51ed0326-ca07-41df-bb0f-ac4aab78d482" />
 
 Видим штатное отображение thin provisioning (thin pool) в LVM.
 
@@ -20,7 +19,7 @@ pve-data-tpool (253:4) — это объединение метаданных и
 
 pve-data (253:5) — это «главный» том в этом пуле, через который Proxmox управляет тонкими дисками.
 
-pve-vm--100--disk--0 и pve-vm--102--disk--0 и pve-vm--103--disk--0 — это виртуальные диски ВМ, которые лежат внутри этого пула (используют его пространство динамически).
+pve-vm--100--disk--0 и pve-vm--102--disk--0 — это виртуальные диски ВМ, которые лежат внутри этого пула (используют его пространство динамически).
 
 ##### Почему данные дублируются в выводе?
 > Потому что lsblk показывает древовидную структуру:
@@ -33,7 +32,7 @@ pve-vm--100--disk--0 и pve-vm--102--disk--0 и pve-vm--103--disk--0 — это 
 pvs && vgs && lvs
 ```
 
-<img width="1245" height="375" alt="image" src="https://github.com/user-attachments/assets/819f73b1-5be0-48be-8397-de67254dd713" />
+<img width="1254" height="283" alt="image" src="https://github.com/user-attachments/assets/e622adc6-be7b-4e20-b589-45cc41a08db2" />
 
 ##### Текущее состояние ноды
 Локальное хранилище (LVM-thin):
