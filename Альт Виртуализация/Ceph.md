@@ -60,9 +60,12 @@ resize2fs /dev/mapper/pve-root
 
 <img width="1424" height="701" alt="image" src="https://github.com/user-attachments/assets/1463636d-eda7-47f0-9409-edcf1b7d9a20" />
 
-##### 1. Расширяем локальное LVM-thin хранилище за счёт /dev/sdb
+##### 2. Расширяем локальное LVM-thin хранилище за счёт /dev/sdb
 
 ###### Расширяем тонкий пул data на всё свободное место в VG
+
+<img width="1423" height="87" alt="image" src="https://github.com/user-attachments/assets/eef54bc9-b79c-4d67-97b7-de631d60605b" />
+
 ```bash
 lvextend -l +100%FREE pve/data
 ```
@@ -71,9 +74,9 @@ lvextend -l +100%FREE pve/data
 lvs -a -o +devices,size,data_percent,metadata_percent pve/data
 ```
 
-<img width="1262" height="213" alt="image" src="https://github.com/user-attachments/assets/5c963a96-c480-45c3-bf22-dec1facd5bef" />
+<img width="1427" height="175" alt="image" src="https://github.com/user-attachments/assets/00bd90a8-1fe0-42ef-9307-2b5f880735a1" />
 
-##### 2. Настраиваем Ceph на этой ноде (как отдельный кластер или часть общего)
+##### 3. Настраиваем Ceph на этой ноде (как отдельный кластер или часть общего)
 4 диска по 3.6 ТБ – идеально для создания OSD. Если вы хотите использовать Ceph для отказоустойчивого хранилища
 
 Для начала перейдём на вкладку Datacenter -> Ceph -> configure Ceph и нажимаем на эту кнопку
