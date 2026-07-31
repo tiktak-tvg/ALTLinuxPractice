@@ -65,6 +65,44 @@ lvs -a -o +devices,size,data_percent,metadata_percent pve/data
 ##### 2. Настраиваем Ceph на этой ноде (как отдельный кластер или часть общего)
 4 диска по 3.6 ТБ – идеально для создания OSD. Если вы хотите использовать Ceph для отказоустойчивого хранилища
 
+Для начала перейдём на вкладку Datacenter -> Ceph -> configure Ceph и нажимаем на эту кнопку
+
+<img width="1386" height="671" alt="image" src="https://github.com/user-attachments/assets/10813815-42ed-41ad-8de2-a39f8d6fa027" />
+
+Далее выбираем сетевые настройки (CIDR) и ок
+
+<img width="1392" height="699" alt="image" src="https://github.com/user-attachments/assets/8373607b-8d09-4231-a448-083995202229" />
+
+Теперь переходим в Shell на первой ноде
+
+###### Создайте монитор (первый на этой ноде)
+pveceph mon create
+
+###### Проверьте, что кластер создался
+ceph -s   # теперь должна быть информация, хоть и с предупреждениями
+
+###### Если ключ bootstrap-osd не создался автоматически – создайте вручную:
+ceph auth get-or-create client.bootstrap-osd mon 'allow profile bootstrap-osd' -o /etc/ceph/ceph.client.bootstrap-osd.keyring
+mkdir -p /var/lib/ceph/bootstrap-osd /etc/pve/priv/ceph
+cp /etc/ceph/ceph.client.bootstrap-osd.keyring /var/lib/ceph/bootstrap-osd/ceph.keyring
+cp /etc/ceph/ceph.client.bootstrap-osd.keyring /etc/pve/priv/ceph/ceph.client.bootstrap-osd.keyring
+
+###### Очистите диски (если на них были старые метки)
+for disk in sdc sdd sde sdf; do sgdisk --zap-all /dev/$disk; done
+
+###### Создайте OSD
+for disk in sdc sdd sde sdf; do ceph-volume lvm create --data /dev/$disk; done
+
+###### Исправьте правило CRUSH и размер репликации (если будет предупреждение о PG)
+ceph osd crush rule create-replicated rule_osd default osd
+ceph osd pool set .mgr crush_rule rule_osd
+ceph osd pool set .mgr size 2
+
+###### Проверьте статус
+ceph -s
+ceph osd tree
+
+
 ##### Другой вариант
 Выполним команду 
 ```bash
