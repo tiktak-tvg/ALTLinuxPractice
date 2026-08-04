@@ -92,6 +92,8 @@ systemctl status watchdog-mux pve-ha-lrm
 
 Поздравляю, вы полностью привели региональный кластер в отказоустойчивое и профессионально настроенное состояние!
 
+<img width="1389" height="598" alt="image" src="https://github.com/user-attachments/assets/a4e16f2d-ebc7-4126-bffa-b93d9adf0d72" />
+
 Если вы захотите добавить новые виртуальные машины под защиту HA, просто выполняйте команду:
 ```bash
 ha-manager add vm:ID --group cheb-ha-group --state started
