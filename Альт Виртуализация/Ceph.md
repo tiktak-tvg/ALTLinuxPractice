@@ -193,17 +193,24 @@ for disk in sdc sdd sde sdf; do sgdisk --zap-all /dev/$disk; done
 ```bash
 for disk in sdc sdd sde sdf; do ceph-volume lvm create --data /dev/$disk; done
 ```
-###### Исправьте правило CRUSH и размер репликации (если будет предупреждение о PG)
+###### Исправьте правило CRUSH и размер репликации (если будет предупреждение о PG), установим количество реплик, создадим пул rbd
 ```bash
 ceph osd crush rule create-replicated rule_osd default osd
 ceph osd pool set .mgr crush_rule rule_osd
 ceph osd pool set .mgr size 2
+ceph osd pool create vm-pool 128
+ceph osd pool set vm-pool size 2
+ceph osd pool application enable vm-pool rbd
 ```
-
+###### Активируем пул rbd
+```bash
+pvesm add rbd vm-pool --pool vm-pool --content images --krbd 1
+```
 ###### Проверьте статус
+```bash
 ceph -s
 ceph osd tree
-
+```
 
 ##### Другой вариант
 Выполним команду 
