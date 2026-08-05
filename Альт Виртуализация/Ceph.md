@@ -158,6 +158,8 @@ lvs -a -o +devices,size,data_percent,metadata_percent pve/data
 ##### 3. Теперь когда всё привели в порядок, настраиваем Ceph на этой первой ноде (как отдельный кластер или часть общего)
 **4 диска по 3.6 ТБ** – идеально для создания **OSD**. Если вы хотите использовать Ceph для отказоустойчивого хранилища
 
+<img width="1424" height="701" alt="07" src="https://github.com/user-attachments/assets/f132146e-07cf-49a5-88cc-24d9206cb0f2" />
+
 Для начала перейдём на вкладку **Datacenter -> Ceph -> configure Ceph** и нажимаем на эту кнопку
 
 <img width="1386" height="671" alt="image" src="https://github.com/user-attachments/assets/10813815-42ed-41ad-8de2-a39f8d6fa027" />
