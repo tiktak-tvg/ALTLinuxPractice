@@ -136,8 +136,6 @@ resize2fs /dev/mapper/pve-root
 
 <img width="1427" height="197" alt="image" src="https://github.com/user-attachments/assets/95ff53de-849c-49b3-b380-c042eafb38cb" />
 
-<img width="1424" height="701" alt="image" src="https://github.com/user-attachments/assets/1463636d-eda7-47f0-9409-edcf1b7d9a20" />
-
 ##### 2. Расширяем локальное LVM-thin хранилище за счёт /dev/sdb
 ###### Расширяем тонкий пул data на всё свободное место в VG
 
