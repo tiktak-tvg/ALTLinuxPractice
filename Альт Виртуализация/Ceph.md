@@ -215,8 +215,10 @@ ceph osd tree
 ```
 
 
+<img width="1754" height="1086" alt="image" src="https://github.com/user-attachments/assets/47de0c68-e47d-4492-85f9-f3ce893c3c38" />
 
 
+<img width="1748" height="598" alt="image" src="https://github.com/user-attachments/assets/b7bbf0fe-b78f-49ae-8408-dfda8f5b8f80" />
 
 
 
