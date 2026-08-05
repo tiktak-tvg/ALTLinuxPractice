@@ -216,6 +216,32 @@ pvesm add rbd vm-pool --pool vm-pool --content images --krbd 1
 ceph -s
 ceph osd tree
 ```
+Теперь мы имеем две физические ноды, но все службы управления (mon, mgr) запущены только на первой.
+
+Поскольку этот кластер также работает на базе Proxmox VE, мы сделаем его отказоустойчивым по уже проверенной, безопасной схеме.
+
+#### Шаг 1. Переводим пулы в режим двух нод 
+Перед добавлением служб обязательно разрешите кластеру продолжать запись, если одна из нод выйдет из строя. Выполните эти две команды на первой ноде (r18-izhevsk-r7-v01):
+```bash
+ceph osd pool set vm-pool min_size 1
+ceph osd pool set .mgr min_size 1
+Проверим применились ли настройки
+ceph osd pool ls detail
+```
+#### Шаг 2. Добавляем второй Монитор и Менеджер
+Так как вы уже находитесь в консоли второй ноды (r18-izhevsk-r7-v02), вы вызовете родные утилиты Proxmox PVE. 
+
+Они сами создадут нужные ключи и каталоги.
+
+Выполните на второй ноде (r18-izhevsk-r7-v02) по очереди две команды:
+```bash
+pveceph mon create
+
+pveceph mgr create
+```
+>[Warning!] Если вдруг ошибка при создании ``pveceph mon createfile '/etc/ceph/ceph.conf' already exists and is not a symlink to /etc/pve/ceph.conf`` и ``pveceph mgr createfile '/etc/ceph/ceph.conf' already exists and is not a symlink to /etc/pve/ceph.conf``
+значит на второй ноде (r18-izhevsk-r7-v02) остался старый локальный файл конфигурации /etc/ceph/ceph.conf
+
 ###### Проверьте разметку дисков командами 
 ```bash
 pvs && vgs && lvs
@@ -233,6 +259,7 @@ ceph osd df
 ```
 
 
+<img width="1407" height="566" alt="image" src="https://github.com/user-attachments/assets/90ac29a6-24fa-4360-be8f-235b612826e3" />
 
 
 <img width="1754" height="1086" alt="image" src="https://github.com/user-attachments/assets/47de0c68-e47d-4492-85f9-f3ce893c3c38" />
