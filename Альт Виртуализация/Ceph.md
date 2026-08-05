@@ -239,8 +239,167 @@ pveceph mon create
 
 pveceph mgr create
 ```
->[Warning!] Если вдруг ошибка при создании ``pveceph mon createfile '/etc/ceph/ceph.conf' already exists and is not a symlink to /etc/pve/ceph.conf`` и ``pveceph mgr createfile '/etc/ceph/ceph.conf' already exists and is not a symlink to /etc/pve/ceph.conf``
+>[!Warning]
+>Если вдруг ошибка при создании ``pveceph mon createfile '/etc/ceph/ceph.conf' already exists and is not a symlink to /etc/pve/ceph.conf`` и ``pveceph mgr createfile '/etc/ceph/ceph.conf' already exists and is not a symlink to /etc/pve/ceph.conf``
 значит на второй ноде (r18-izhevsk-r7-v02) остался старый локальный файл конфигурации /etc/ceph/ceph.conf
+
+##### Делаем бэкап и удаляем старый файл
+Выполните на второй ноде (r18-izhevsk-r7-v02) команды, чтобы безопасно убрать мешающий конфиг:
+```bash 
+Переименовываем старый файл в бэкап (на всякий случай)
+mv /etc/ceph/ceph.conf /etc/ceph/ceph.conf.bak
+Создаем правильную символическую ссылку на кластерный конфиг Proxmox
+ln -s /etc/pve/ceph.conf /etc/ceph/ceph.conf
+```
+> Теперь повторяем Шаг 3 заново.
+
+Далее проверьте общий статус:
+```bash
+ceph -s
+```
+В секции services должно стать:
+```text
+mon: 2 daemons, quorum r18-izhevsk-r7-v01,r18-izhevsk-r7-v02
+mgr: r18-izhevsk-r7-v01(active...), standbys: r18-izhevsk-r7-v02
+```
+Далее, так как мы находимся в замкнутом контуре без выхода в интернет, нам нужно настроить локальный NTP-сервер на одном из узлов (например, на первом) и использовать его как источник для второго узла, либо настроить оба узла использовать аппаратные часы или друг друга.
+
+В данной ситуации **кластер требует синхронизации времени между узлами**, поэтому достаточно, чтобы они оба имели одинаковое время, даже если оно не абсолютно точное (но желательно близкое к реальному). 
+
+Мы можем настроить один узел как NTP-сервер, а второй синхронизироваться с ним.
+
+**План:**
+
+- На первом узле (r18-izhevsk-r7-v01) настроить chrony как сервер для локальной сети (разрешить синхронизацию с второго узла).
+
+- На втором узле настроить chrony для использования первого узла как источника.
+
+- Запустить chrony на втором узле.
+
+- Проверить синхронизацию.
+
+#### Пошаговая настройка синхронизации времени
+##### 1. На первом узле (r18-izhevsk-r7-v01) – настроить chrony как сервер
+
+Отредактируйте конфигурационный файл /etc/chrony.conf:
+```bash
+vi /etc/chrony.conf
+```
+Добавьте или убедитесь, что присутствуют следующие строки:
+
+```text
+# Разрешить синхронизацию с узла r18-izhevsk-r7-v02 (IP 10.113.76.54)
+allow 10.113.76.54
+
+# Также можно разрешить всю подсеть
+# allow 10.113.76.0/24
+
+# Оставить локальный источник как запасной (уже должно быть)
+local stratum 10
+```
+После редактирования перезапустите chrony:
+
+```bash
+systemctl restart chronyd
+systemctl enable chronyd
+```
+Проверьте статус:
+```bash
+chronyc tracking
+```
+Теперь этот узел будет отвечать на NTP-запросы с IP 10.113.76.54.
+
+##### 2. На втором узле (r18-izhevsk-r7-v02) – настроить chrony как клиент
+
+Отредактируйте /etc/chrony.conf:
+```bash
+nano /etc/chrony.conf
+```
+Закомментируйте все внешние пулы (если есть) и добавьте строку с указанием первого узла как сервера:
+```text
+server 10.113.76.53 iburst
+```
+Также можно добавить локальный источник на случай, если сервер недоступен:
+```text
+local stratum 10
+```
+Сохраните файл.
+
+Запустите и включите chrony:
+```bash
+systemctl enable chronyd
+systemctl start chronyd
+```
+Если возникает ошибка «Cannot talk to daemon» – возможно, демон не запущен. Проверьте:
+```bash
+systemctl status chronyd
+```
+Если есть ошибки, посмотрите логи:
+```bash
+journalctl -u chronyd -n 20
+```
+##### 3. Проверьте синхронизацию
+На втором узле выполните:
+```bash
+chronyc sources -v
+```
+Вы должны увидеть сервер 10.113.76.53 в списке с состоянием ^* (выбранный источник) или ^+ (кандидат).
+
+Затем проверьте смещение:
+```bash
+chronyc tracking
+```
+Если смещение большое, можно принудительно сделать шаг:
+```bash
+chronyc -a makestep
+```
+Теперь проверьте время на обоих узлах – разница должна быть менее 0.1 секунды:
+```bash
+date
+```
+##### 4. Если порт UDP 123 заблокирован
+На втором узле может быть включён межсетевой экран (firewalld или iptables), который блокирует входящие/исходящие NTP-запросы. На первом узле тоже нужно разрешить.
+
+На обоих узлах выполните (если используется firewalld):
+```bash
+firewall-cmd --permanent --add-service=ntp
+firewall-cmd --reload
+```
+Или если используется iptables:
+```bash
+iptables -I INPUT -p udp --dport 123 -j ACCEPT
+iptables -I OUTPUT -p udp --sport 123 -j ACCEPT
+service iptables save
+```
+##### 5. После синхронизации времени – проверьте кластер
+На любом узле выполните:
+```bash
+ceph -s
+ceph health detail
+```
+
+
+
+
+
+
+
+
+
+
+
+
+<img width="1164" height="314" alt="image" src="https://github.com/user-attachments/assets/a62a25ca-42bb-4c4c-a487-37d26a4bc379" />
+
+
+
+
+
+
+
+
+
+
 
 ###### Проверьте разметку дисков командами 
 ```bash
