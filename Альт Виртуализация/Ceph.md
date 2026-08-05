@@ -216,6 +216,44 @@ pvesm add rbd vm-pool --pool vm-pool --content images --krbd 1
 ceph -s
 ceph osd tree
 ```
+##### 4. Теперь настраиваем Ceph на второй ноде (как отдельный кластер или часть общего)
+Убедитесь, что на второй ноде есть конфиг и ключ администратора
+1️⃣ Если вы ещё не скопировали их с первой ноды, сделайте это сейчас (на второй ноде):
+
+```bash
+scp root@10.113.76.53:/etc/ceph/ceph.conf /etc/ceph/
+scp root@10.113.76.53:/etc/ceph/ceph.client.admin.keyring /etc/ceph/
+```
+2️⃣ Создайте ключ bootstrap-osd на второй ноде
+```bash
+ceph auth get-or-create client.bootstrap-osd mon 'allow profile bootstrap-osd' -o /etc/ceph/ceph.client.bootstrap-osd.keyring
+```
+Если команда выполняется без ошибок — ключ создан.
+
+3️⃣ Скопируйте ключ в стандартные каталоги
+```bash
+mkdir -p /var/lib/ceph/bootstrap-osd /etc/pve/priv/ceph
+cp /etc/ceph/ceph.client.bootstrap-osd.keyring /var/lib/ceph/bootstrap-osd/ceph.keyring
+cp /etc/ceph/ceph.client.bootstrap-osd.keyring /etc/pve/priv/ceph/ceph.client.bootstrap-osd.keyring
+chmod 600 /etc/ceph/ceph.client.bootstrap-osd.keyring /var/lib/ceph/bootstrap-osd/ceph.keyring /etc/pve/priv/ceph/ceph.client.bootstrap-osd.keyring
+```
+4️⃣ Очистите диски (если ещё не делали)
+```bash
+for disk in sdc sdd sde sdf; do sgdisk --zap-all /dev/$disk; done
+```
+5️⃣ Создайте OSD
+```bash
+for disk in sdc sdd sde sdf; do ceph-volume lvm create --data /dev/$disk; done
+```
+Теперь процесс должен пройти успешно.
+
+6️⃣ Проверьте результат (на любой ноде)
+```bash
+ceph osd tree
+```
+Вы увидите новые OSD (ID 4,5,6,7) на хосте r18-izhevsk-r7-v02.
+
+
 Теперь мы имеем две физические ноды, но все службы управления (mon, mgr) запущены только на первой.
 
 Поскольку этот кластер также работает на базе Proxmox VE, мы сделаем его отказоустойчивым по уже проверенной, безопасной схеме.
