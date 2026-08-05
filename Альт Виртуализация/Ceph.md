@@ -208,11 +208,31 @@ ceph osd pool application enable vm-pool rbd
 ```bash
 pvesm add rbd vm-pool --pool vm-pool --content images --krbd 1
 ```
+
+<img width="1286" height="405" alt="image" src="https://github.com/user-attachments/assets/6bbb073d-82a9-4a1e-93e8-197b8e7fc7ee" />
+
 ###### Проверьте статус
 ```bash
 ceph -s
 ceph osd tree
 ```
+###### Проверьте разметку дисков командами 
+```bash
+pvs && vgs && lvs
+```
+<img width="1531" height="524" alt="image" src="https://github.com/user-attachments/assets/04fdd7dc-5c3f-4d02-ae59-be0affbf5732" />
+
+```bash
+ceph osd df
+```
+
+<img width="1486" height="225" alt="image" src="https://github.com/user-attachments/assets/dfc76879-48f0-4586-a42c-68ca7a5e0b14" />
+
+```bash
+
+```
+
+
 
 
 <img width="1754" height="1086" alt="image" src="https://github.com/user-attachments/assets/47de0c68-e47d-4492-85f9-f3ce893c3c38" />
