@@ -469,6 +469,8 @@ ceph osd df
 <img width="3049" height="832" alt="image" src="https://github.com/user-attachments/assets/48bf9586-ebbc-49d9-b0fc-2d1dd26bf62b" />
 
 
+<img width="1903" height="585" alt="image" src="https://github.com/user-attachments/assets/196f6250-8f52-437b-b945-30cc23acbbe9" />
+
 
 
 
